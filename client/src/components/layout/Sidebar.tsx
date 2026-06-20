@@ -12,7 +12,12 @@ import { useState } from 'react';
 import { useNotifications } from '../../hooks/useNotifications';
 import { disconnectSocket } from '../../hooks/useSocket';
 
-export const Sidebar = () => {
+interface SidebarProps {
+  mobileMenuOpen: boolean;
+  setMobileMenuOpen: (open: boolean) => void;
+}
+
+export const Sidebar = ({ mobileMenuOpen, setMobileMenuOpen }: SidebarProps) => {
   const location = useLocation();
   const dispatch = useDispatch();
   const { user } = useSelector((state: RootState) => state.auth);
@@ -89,12 +94,23 @@ export const Sidebar = () => {
   const links = allLinks.filter(link => link.roles.includes(role));
 
   return (
-    <div
-      className={cn(
-        'flex flex-col h-screen bg-card border-r border-border sticky top-0 transition-all duration-300',
-        collapsed ? 'w-16' : 'w-64'
+    <>
+      {/* Mobile Overlay */}
+      {mobileMenuOpen && (
+        <div 
+          className="fixed inset-0 z-40 bg-background/80 backdrop-blur-sm md:hidden"
+          onClick={() => setMobileMenuOpen(false)}
+        />
       )}
-    >
+
+      {/* Sidebar */}
+      <div
+        className={cn(
+          'fixed inset-y-0 left-0 z-50 flex flex-col h-screen bg-card border-r border-border transition-all duration-300 md:relative',
+          collapsed ? 'w-16' : 'w-64',
+          mobileMenuOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'
+        )}
+      >
       {/* Logo & Collapse */}
       <div className="flex items-center justify-between h-16 border-b border-border px-4">
         {!collapsed && (
@@ -104,7 +120,13 @@ export const Sidebar = () => {
           </div>
         )}
         <button
-          onClick={() => setCollapsed(c => !c)}
+          onClick={() => {
+            if (window.innerWidth < 768) {
+              setMobileMenuOpen(false);
+            } else {
+              setCollapsed(c => !c);
+            }
+          }}
           className="p-1 rounded hover:bg-accent text-muted-foreground ml-auto"
           title={collapsed ? 'Expand' : 'Collapse'}
         >
@@ -123,6 +145,7 @@ export const Sidebar = () => {
                 key={link.name}
                 to={link.path}
                 title={collapsed ? link.name : undefined}
+                onClick={() => { if (window.innerWidth < 768) setMobileMenuOpen(false); }}
                 className={cn(
                   'flex items-center px-3 py-2 mt-1 text-sm font-semibold rounded-lg transition-all relative',
                   isActive
@@ -153,6 +176,7 @@ export const Sidebar = () => {
           <Link
             to="/settings"
             title={collapsed ? 'Settings' : undefined}
+            onClick={() => { if (window.innerWidth < 768) setMobileMenuOpen(false); }}
             className={cn(
               'flex items-center px-3 py-2 text-sm font-semibold text-muted-foreground rounded-lg hover:bg-accent hover:text-accent-foreground transition-all',
               collapsed ? 'justify-center' : 'gap-3'
@@ -178,5 +202,6 @@ export const Sidebar = () => {
         </button>
       </div>
     </div>
+    </>
   );
 };
