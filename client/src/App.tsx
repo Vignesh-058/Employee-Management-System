@@ -9,7 +9,7 @@ import { setLoading, setCredentials } from './store/slices/authSlice';
 import api from './lib/axios';
 import { useSocket } from './hooks/useSocket';
 
-import { GoogleOAuthProvider } from '@react-oauth/google';
+
 
 // Lazy loading components
 const Dashboard = lazy(() => import('./pages/Dashboard'));
@@ -61,7 +61,7 @@ function App() {
   const fallback = <div className="flex h-screen items-center justify-center">Loading module...</div>;
 
   return (
-    <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID || 'placeholder'}>
+
       <ErrorBoundary>
         <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
           <SocketInitializer />
@@ -115,7 +115,7 @@ function App() {
         </Suspense>
       </BrowserRouter>
     </ErrorBoundary>
-    </GoogleOAuthProvider>
+
   );
 }
 
